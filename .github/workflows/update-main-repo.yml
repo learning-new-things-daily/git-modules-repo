@@ -1,0 +1,26 @@
+name: Update Submodule in Main Repo
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update-submodule:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Submodule Repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Clone Main Repo
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git clone https://x-access-token:${{ secrets.MAIN_REPO_TOKEN }}@github.com/learning-new-things-daily/main-repo.git
+          cd main-repo
+          git submodule update --remote modules
+          git add modules
+          git commit -m "Auto-update submodule to latest commit" || echo "No changes to commit"
+          git push origin main
